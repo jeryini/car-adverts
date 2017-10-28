@@ -1,11 +1,13 @@
 package models;
 
+import com.amazonaws.services.devicefarm.model.ArgumentException;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CarAdvert {
 
@@ -105,7 +107,40 @@ public class CarAdvert {
         map.put("price", new AttributeValue().withN(price.toString()));
         map.put("isNew", new AttributeValue().withBOOL(isNew));
         map.put("mileage", new AttributeValue().withN(mileage.toString()));
+        // todo: put this into proper format
         map.put("first_registration", new AttributeValue(first_registration.toString()));
         return map;
     }
+
+    public static CarAdvert fromDynamoMapAttribute(Map<String, AttributeValue> item) throws ParseException {
+        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+        Date first_registration = format.parse(item.get("first_registration").getS());
+
+        return new CarAdvert(
+            item.get("id").getS(),
+            item.get("title").getS(),
+            FuelType.valueOf(item.get("fuel").getS()),
+            Integer.parseInt(item.get("price").getN()),
+            item.get("isNew").getBOOL(),
+            Integer.parseInt(item.get("mileage").getN()),
+            first_registration
+        );
+    }
+
+    public static CarAdvert fromDynamoItem(Item item) throws ParseException {
+        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+        Date first_registration = format.parse(item.getString("first_registration"));
+
+        return new CarAdvert(
+                item.getString("id"),
+                item.getString("title"),
+                FuelType.valueOf(item.getString("fuel")),
+                item.getInt("price"),
+                item.getBoolean("isNew"),
+                item.getInt("mileage"),
+                first_registration
+        );
+    }
+
+
 }
