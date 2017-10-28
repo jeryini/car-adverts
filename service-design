@@ -1,0 +1,52 @@
+Web service contract:
+* Car type:
+    * **id** (_required_): **guid**,
+    * **title** (_required_): **string**
+    * **fuel** (_required_): **FuelType**
+    * **price** (_required_): **integer**;
+    * **new** (_required_): **boolean**
+    * **mileage** (_only for used cars_): **integer**;
+    * **first registration** (_only for used cars_): **date** without time.
+* FuelType type:
+    * **id** (_required_): **guid**
+    * **type** (_required_): **string**
+* RESTful endpoints:
+    * Root: /cars/adverts
+        * List of all car adverts:
+            * Path: .
+            * HTTP method: GET
+            * Params: sort
+        * Single car advert by id:
+            * Path: /[car_advert_id]
+            * HTTP method: GET
+        * Add car advert:
+            * Path: .
+            * HTTP method: POST
+        * Modify car advert:
+            * Path: /[car_advert_id]
+            * HTTP method: PUT
+        * Delete car advert:
+            * Path: /[car_advert_id]
+            * HTTP method: DELETE
+* JSON request/response format message:
+    * Add/modify:
+        * {
+            'title': 'BMW 3 Series F30',
+            'fuel': 'diesel',
+            'price': 2000000,
+            'new': false,
+            'mileage': 80000,
+            'first_registration': '2015-11-20'
+          }
+      * Get/list:
+        [
+            {
+               'title': 'BMW 3 Series F30',
+               'fuel': 'diesel',
+               'price': 2000000,
+               'new': false,
+               'mileage': 80000,
+               'first_registration': '2015-11-20'
+            },
+            ...
+        ]
