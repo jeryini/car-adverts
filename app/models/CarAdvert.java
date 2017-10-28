@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class CarAdvert {
 
@@ -31,6 +32,7 @@ public class CarAdvert {
 
     public CarAdvert(String title, FuelType fuel, Integer price, Boolean isNew, Integer mileage,
                      Date first_registration) {
+        this.id = UUID.randomUUID().toString();
         this.title = title;
         this.fuel = fuel;
         this.price = price;
@@ -97,6 +99,7 @@ public class CarAdvert {
 
     public Map<String, AttributeValue> toDynamoMap() {
         Map<String, AttributeValue> map = new HashMap<String, AttributeValue>();
+        map.put("id", new AttributeValue(id));
         map.put("title", new AttributeValue(title));
         map.put("fuel", new AttributeValue(fuel.toString()));
         map.put("price", new AttributeValue().withN(price.toString()));

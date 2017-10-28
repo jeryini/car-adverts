@@ -25,12 +25,12 @@ public class DynamoDBServiceTest {
     @Test
     public void test() {
         try {
-            String tableName = "car-adverts";
+            String tableName = "car-adverts-api";
 
             // Create a table with a primary hash key named 'name', which holds a string
             // TODO: check for pre-existing table instead of generic exception handling
             try {
-                DynamoDBService.createTable(tableName, "name");
+                DynamoDBService.createTable(tableName, "id");
             }
             catch (Exception e) {
             }
