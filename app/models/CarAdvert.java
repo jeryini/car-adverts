@@ -108,7 +108,6 @@ public class CarAdvert {
         map.put("price", new AttributeValue().withN(price.toString()));
         map.put("isNew", new AttributeValue().withBOOL(isNew));
         map.put("mileage", new AttributeValue().withN(mileage.toString()));
-        // todo: put this into proper format
         map.put("first_registration", new AttributeValue(dateFormat.format(first_registration)));
         return map;
     }

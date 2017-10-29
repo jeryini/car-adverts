@@ -103,4 +103,28 @@ public class DynamoDBServiceTest {
         }
     }
 
+    @Test
+    public void updateTest() {
+        try {
+            // Add an item
+            CarAdvert ca1 = new CarAdvert("Volvo X60", CarAdvert.FuelType.DIESEL, 5000000, Boolean.TRUE, 0, cal.getTime());
+            Map<String, AttributeValue> item = ca1.toDynamoMap();
+            DynamoDBService.putItem(TABLE_NAME, item);
+
+            // update the item
+            ca1.setPrice(6000000);
+            ca1.setTitle("Volvo XC60");
+            DynamoDBService.updateItem(TABLE_NAME, ca1.toDynamoMap());
+
+            // get the item
+            CarAdvert ca2 = CarAdvert.fromDynamoItem(DynamoDBService.getItem(TABLE_NAME, ca1.getId()));
+            Assert.assertEquals(ca1.getTitle(), ca2.getTitle());
+            Assert.assertEquals(ca1.getPrice(), ca2.getPrice());
+        } catch (AmazonClientException ace) {
+            fail();
+        } catch (ParseException pse) {
+            fail();
+        }
+    }
+
 }
