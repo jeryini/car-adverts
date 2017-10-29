@@ -23,6 +23,5 @@ http://www.playframework.com/download
 ### Run the app
 Run the following in project root:
 
-    sbt testProd
-    
-Don't run just `sbt run`, as otherwise the startup 
+    sbt run
+ 
