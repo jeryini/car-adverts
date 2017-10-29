@@ -12,6 +12,7 @@ import java.util.*;
 public class CarAdvert {
 
     public enum FuelType { GASOLINE, DIESEL, ELECTRIC }
+    public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private String id;
     private String title;
@@ -108,13 +109,12 @@ public class CarAdvert {
         map.put("isNew", new AttributeValue().withBOOL(isNew));
         map.put("mileage", new AttributeValue().withN(mileage.toString()));
         // todo: put this into proper format
-        map.put("first_registration", new AttributeValue(first_registration.toString()));
+        map.put("first_registration", new AttributeValue(dateFormat.format(first_registration)));
         return map;
     }
 
     public static CarAdvert fromDynamoMapAttribute(Map<String, AttributeValue> item) throws ParseException {
-        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        Date first_registration = format.parse(item.get("first_registration").getS());
+        Date first_registration = dateFormat.parse(item.get("first_registration").getS());
 
         return new CarAdvert(
             item.get("id").getS(),
@@ -128,8 +128,7 @@ public class CarAdvert {
     }
 
     public static CarAdvert fromDynamoItem(Item item) throws ParseException {
-        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        Date first_registration = format.parse(item.getString("first_registration"));
+        Date first_registration = dateFormat.parse(item.getString("first_registration"));
 
         return new CarAdvert(
                 item.getString("id"),
