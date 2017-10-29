@@ -36,7 +36,7 @@ public class ApplicationStart {
         cal.set(Calendar.YEAR, 2015);
         cal.set(Calendar.MONTH, Calendar.NOVEMBER);
         cal.set(Calendar.DAY_OF_MONTH, 10);
-        
+
         // Add an item
         CarAdvert ca1 = new CarAdvert("BMW Series 3", CarAdvert.FuelType.DIESEL, 2000000, Boolean.FALSE, 100000, cal.getTime());
         DynamoDBService.saveItem(ca1);

@@ -67,35 +67,6 @@ public class DynamoDBServiceTest {
     }
 
     @Test
-    public void scanTest() {
-        try {
-            // Add an item
-            CarAdvert ca1 = new CarAdvert("Renault Megane", CarAdvert.FuelType.DIESEL, 1000000, Boolean.FALSE, 100000, cal.getTime());
-            DynamoDBService.saveItem(ca1);
-
-            // Add another item
-            CarAdvert ca2 = new CarAdvert("Volkswagen Passat", CarAdvert.FuelType.GASOLINE, 3220000, Boolean.TRUE, 0, cal.getTime());
-            DynamoDBService.saveItem(ca2);
-
-            // Scan for adverts with a price attribute greater than 2500000
-            HashMap<String, Condition> scanFilter = new HashMap<String, Condition>();
-            Condition condition = new Condition()
-                    .withComparisonOperator(ComparisonOperator.GT.toString())
-                    .withAttributeValueList(new AttributeValue().withN("2500000"));
-            scanFilter.put("price", condition);
-
-            ScanResult scanResult = DynamoDBService.scan(TABLE_NAME, scanFilter);
-            System.out.println("Result: " + scanResult);
-
-            Assert.assertSame(1, scanResult.getCount());
-            Map<String, AttributeValue> firstResult = scanResult.getItems().iterator().next();
-            Assert.assertEquals("Volkswagen Passat", firstResult.get("title").getS());
-        } catch (AmazonClientException ace) {
-            fail();
-        }
-    }
-
-    @Test
     public void updateTest() {
         try {
             // Add an item
