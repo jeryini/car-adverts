@@ -4,25 +4,26 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.model.*;
+import models.CarAdvert;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class DynamoDBService {
 
     private static AmazonDynamoDB client;
-    private static DynamoDB dynamoDB;
+    private static DynamoDBMapper mapper;
 
     static {
+        // connect client to local endpoint
         client = AmazonDynamoDBClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:8000","us-west-2")).build();
-        dynamoDB = new DynamoDB(client);
+
+        // mapper for easier CRUD operations
+        mapper = new DynamoDBMapper(client);
     }
 
     public static void createTable(String tableName, String primaryKeyAttributeName) {
@@ -60,8 +61,12 @@ public class DynamoDBService {
     }
 
     public static TableDescription getTableDescription(String tableName) {
-        DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(tableName);
-        return client.describeTable(describeTableRequest).getTable();
+        try {
+            DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(tableName);
+            return client.describeTable(describeTableRequest).getTable();
+        } catch (ResourceNotFoundException rnfe) {
+            return null;
+        }
     }
 
     public static void deleteTable(String tableName) {
@@ -69,44 +74,36 @@ public class DynamoDBService {
     }
 
     /**
-     * Create new item, i.e. a POST operation.
+     * If table already exists, then delete it. In either case create table in the end.
      *
      * @param tableName
+     */
+    public static void resetTable(String tableName) {
+        try {
+            TableDescription table = getTableDescription(tableName);
+
+            if (table != null) {
+                deleteTable(tableName);
+            }
+
+            createTable(tableName, "Id");
+        } catch ( AmazonServiceException ase ) {
+            if (!ase.getErrorCode().equalsIgnoreCase("ResourceNotFoundException"))
+                throw ase;
+        }
+    }
+
+    /**
+     * Create new item or update existing one.
+     *
      * @param item
      */
-    public static PutItemResult putItem(String tableName, Map<String, AttributeValue> item) {
-        PutItemRequest putItemRequest = new PutItemRequest(tableName, item);
-        PutItemResult putItemResult = client.putItem(putItemRequest);
-        System.out.println("Result: " + putItemResult);
-        return putItemResult;
+    public static void saveItem(CarAdvert item) {
+        mapper.save(item);
     }
 
-    public static UpdateItemResult updateItem(String tableName, Map<String, AttributeValue> item) {
-        Table table = dynamoDB.getTable(tableName);
-
-        // prepare attribute names
-        Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
-        for (Map.Entry<String, AttributeValue> entry : item.entrySet()) {
-            String key = ":" + entry.getKey();
-            AttributeValue value = entry.getValue();
-
-            expressionAttributeValues.put(key, value.toString());
-        }
-
-        UpdateItemOutcome outcome = table.updateItem(
-            "id",
-            item.get("id"),
-            "set title = :title set fuel = :fuel set price = :price set isNew = :isNew set mileage = :mileage set first_registration = :first_registration",
-            null,
-            expressionAttributeValues
-        );
-
-        return outcome.getUpdateItemResult();
-    }
-
-    public static Item getItem(String tableName, String id) {
-        Table table = dynamoDB.getTable(tableName);
-        return table.getItem("id", id);
+    public static CarAdvert getItem(String id) {
+        return mapper.load(CarAdvert.class, id, DynamoDBMapperConfig.ConsistentReads.CONSISTENT.config());
     }
 
     public static ScanResult scan(String tableName, HashMap<String, Condition> scanFilter) {
