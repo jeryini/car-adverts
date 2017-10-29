@@ -7,6 +7,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import util.JsonDateSerializer;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -89,12 +91,12 @@ public class CarAdvert {
     }
 
     @DynamoDBAttribute(attributeName="IsNew")
-    public Boolean getNew() {
+    public Boolean getIsNew() {
         return isNew;
     }
 
-    public void setNew(Boolean aNew) {
-        isNew = aNew;
+    public void setIsNew(Boolean isNew) {
+        this.isNew = isNew;
     }
 
     @DynamoDBAttribute(attributeName="Mileage")
@@ -107,6 +109,7 @@ public class CarAdvert {
     }
 
     @DynamoDBAttribute(attributeName="FirstRegistration")
+    @JsonSerialize(using=JsonDateSerializer.class)
     public Date getFirst_registration() {
         return first_registration;
     }
