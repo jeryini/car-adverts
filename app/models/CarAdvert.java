@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import play.data.validation.Constraints;
 import util.JsonDateSerializer;
 
 import java.text.DateFormat;
@@ -18,15 +19,25 @@ import java.util.*;
 @DynamoDBTable(tableName="AdvertsCatalog")
 public class CarAdvert {
 
+    // interfaces defining two groups of All and Used cars
+    public interface All {}
+    public interface Used {}
+
     public enum FuelType { GASOLINE, DIESEL, ELECTRIC }
     private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private String id;
+    @Constraints.Required(groups = All.class)
     private String title;
+    @Constraints.Required(groups = All.class)
     private FuelType fuel;
+    @Constraints.Required(groups = All.class)
     private Integer price;
+    @Constraints.Required(groups = All.class)
     private Boolean isNew;
+    @Constraints.Required(groups = Used.class)
     private Integer mileage;
+    @Constraints.Required(groups = Used.class)
     private Date first_registration;
 
     public CarAdvert() {}
@@ -132,7 +143,11 @@ public class CarAdvert {
             this.title = values.get("title").textValue();
         }
         if (values.has("fuel")) {
-            this.fuel = FuelType.valueOf(values.get("fuel").textValue());
+            try {
+                this.fuel = FuelType.valueOf(values.get("fuel").textValue());
+            } catch (IllegalArgumentException | NullPointerException ex) {
+                this.fuel = null;
+            }
         }
         if (values.has("price")) {
             this.price = values.get("price").intValue();
@@ -147,10 +162,10 @@ public class CarAdvert {
             Date first_registration = null;
             try {
                 first_registration = dateFormat.parse(values.get("first_registration").textValue());
-            } catch (ParseException e) {
-                e.printStackTrace();
+                this.first_registration = first_registration;
+            } catch (ParseException | NullPointerException e) {
+                this.first_registration = null;
             }
-            this.first_registration = first_registration;
         }
     }
 
