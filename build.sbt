@@ -8,7 +8,14 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
       
 scalaVersion := "2.11.11"
 
-libraryDependencies ++= Seq( javaJdbc , cache , javaWs, "com.amazonaws" % "aws-java-sdk" % "1.11.221", "junit" % "junit" % "4.12" % "test" )
+libraryDependencies ++= Seq(
+  javaJdbc,
+  cache,
+  javaWs,
+  "com.amazonaws" % "aws-java-sdk" % "1.11.221",
+  "junit" % "junit" % "4.12" % "test",
+  "com.mashape.unirest" % "unirest-java" % "1.4.9"
+)
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 

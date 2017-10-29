@@ -3,7 +3,7 @@
 # ~~~~
 
 # List of all car adverts
-GET     /              controllers.CarAdvertApiController.listCarAdverts
+GET     /              controllers.CarAdvertApiController.listCarAdverts(sort:String ?= "id")
 
 # Get existing car advert
 GET    /:id           controllers.CarAdvertApiController.retrieve(id:String)

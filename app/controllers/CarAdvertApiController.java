@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import models.CarAdvert;
-import play.data.validation.Constraints;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -129,8 +128,13 @@ public class CarAdvertApiController extends Controller {
         return ok(Util.createResponse("CarAdvert with id:" + id + " deleted", true));
     }
 
-    public Result listCarAdverts() {
-        List<CarAdvert> result = DynamoDBService.getAll();
+    /**
+     * List all adverts.
+     *
+     * @return
+     */
+    public Result listCarAdverts(String sort) {
+        List<CarAdvert> result = DynamoDBService.getAll(sort);
         ObjectMapper mapper = new ObjectMapper();
 
         JsonNode jsonData = mapper.convertValue(result, JsonNode.class);

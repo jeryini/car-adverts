@@ -4,14 +4,11 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.*;
 import models.CarAdvert;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 public class DynamoDBService {
@@ -112,8 +109,41 @@ public class DynamoDBService {
         mapper.delete(carAdvert);
     }
 
-    public static List<CarAdvert> getAll() {
-        return mapper.scan(CarAdvert.class, new DynamoDBScanExpression());
+    public static List<CarAdvert> getAll(String sort) {
+        PaginatedScanList<CarAdvert> adverts = mapper.scan(CarAdvert.class, new DynamoDBScanExpression());
+        List<CarAdvert> advertsAll = new ArrayList<CarAdvert>(adverts);
+
+        // for now do in memory sorting, though it would be wise to set up indexes to support sorting on the DB side
+        Comparator cmp;
+        switch (sort) {
+            case "id":
+                cmp = Comparator.comparing(CarAdvert::getId);
+                break;
+            case "title":
+                cmp = Comparator.comparing(CarAdvert::getTitle);
+                break;
+            case "fuel":
+                cmp = Comparator.comparing(CarAdvert::getFuel);
+                break;
+            case "price":
+                cmp = Comparator.comparing(CarAdvert::getPrice);
+                break;
+            case "isNew":
+                cmp = Comparator.comparing(CarAdvert::getIsNew);
+                break;
+            case "mileage":
+                cmp = Comparator.comparing(CarAdvert::getMileage);
+                break;
+            case "first_registration":
+                cmp = Comparator.comparing(CarAdvert::getFirst_registration);
+                break;
+            default:
+                cmp = Comparator.comparing(CarAdvert::getId);
+                break;
+        }
+
+        advertsAll.sort(cmp);
+        return advertsAll;
     }
 
     public static ScanResult scan(String tableName, HashMap<String, Condition> scanFilter) {
