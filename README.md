@@ -21,7 +21,8 @@ Extract the archive and run:
 http://www.playframework.com/download
 
 ### Run the app
-Run the following in project rot
+Run the following in project root:
 
-    sbt
-    run
+    sbt testProd
+    
+Don't run just `sbt run`, as otherwise the startup 
