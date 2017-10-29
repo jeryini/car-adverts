@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -112,6 +113,42 @@ public class CarAdvert {
 
     public void setFirst_registration(Date first_registration) {
         this.first_registration = first_registration;
+    }
+
+    public void assignUUID() {
+        this.id = UUID.randomUUID().toString();
+    }
+
+    /**
+     * Updates POJO object with values defined in JSON.
+     *
+     * @param values
+     */
+    public void update(JsonNode values) {
+        if (values.has("title")) {
+            this.title = values.get("title").textValue();
+        }
+        if (values.has("fuel")) {
+            this.fuel = FuelType.valueOf(values.get("fuel").textValue());
+        }
+        if (values.has("price")) {
+            this.price = values.get("price").intValue();
+        }
+        if (values.has("isNew")) {
+            this.isNew = values.get("isNew").booleanValue();
+        }
+        if (values.has("mileage")) {
+            this.mileage = values.get("mileage").intValue();
+        }
+        if (values.has("first_registration")) {
+            Date first_registration = null;
+            try {
+                first_registration = dateFormat.parse(values.get("first_registration").textValue());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            this.first_registration = first_registration;
+        }
     }
 
     /**

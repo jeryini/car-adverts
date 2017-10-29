@@ -6,10 +6,12 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.*;
 import models.CarAdvert;
 
 import java.util.HashMap;
+import java.util.List;
 
 
 public class DynamoDBService {
@@ -104,6 +106,14 @@ public class DynamoDBService {
 
     public static CarAdvert getItem(String id) {
         return mapper.load(CarAdvert.class, id, DynamoDBMapperConfig.ConsistentReads.CONSISTENT.config());
+    }
+
+    public static void deleteItem(CarAdvert carAdvert) {
+        mapper.delete(carAdvert);
+    }
+
+    public static List<CarAdvert> getAll() {
+        return mapper.scan(CarAdvert.class, new DynamoDBScanExpression());
     }
 
     public static ScanResult scan(String tableName, HashMap<String, Condition> scanFilter) {

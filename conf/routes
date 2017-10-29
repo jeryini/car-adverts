@@ -2,8 +2,20 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
+# List of all car adverts
+GET     /              controllers.CarAdvertApiController.listCarAdverts
+
+# Get existing car advert
+GET    /:id           controllers.CarAdvertApiController.retrieve(id:String)
+
+# Create new car advert
+POST    /              controllers.CarAdvertApiController.create()
+
+# Update existing car advert
+PUT     /:id              controllers.CarAdvertApiController.update(id:String)
+
+# Delete existing car advert
+DELETE  /:id           controllers.CarAdvertApiController.delete(id:String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
