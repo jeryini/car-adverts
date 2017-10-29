@@ -1,6 +1,9 @@
 package models;
 
-import com.amazonaws.services.devicefarm.model.ArgumentException;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConvertedEnum;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
@@ -9,10 +12,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@DynamoDBTable(tableName="AdvertsCatalog")
 public class CarAdvert {
 
     public enum FuelType { GASOLINE, DIESEL, ELECTRIC }
-    public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private String id;
     private String title;
@@ -21,6 +25,8 @@ public class CarAdvert {
     private Boolean isNew;
     private Integer mileage;
     private Date first_registration;
+
+    public CarAdvert() {}
 
     public CarAdvert(String id, String title, FuelType fuel, Integer price, Boolean isNew, Integer mileage,
                      Date first_registration) {
@@ -44,6 +50,7 @@ public class CarAdvert {
         this.first_registration = first_registration;
     }
 
+    @DynamoDBHashKey(attributeName="Id")
     public String getId() {
         return id;
     }
@@ -52,6 +59,7 @@ public class CarAdvert {
         this.id = id;
     }
 
+    @DynamoDBAttribute(attributeName="Title")
     public String getTitle() {
         return title;
     }
@@ -60,6 +68,8 @@ public class CarAdvert {
         this.title = title;
     }
 
+    @DynamoDBAttribute(attributeName="Fuel")
+    @DynamoDBTypeConvertedEnum
     public FuelType getFuel() {
         return fuel;
     }
@@ -68,6 +78,7 @@ public class CarAdvert {
         this.fuel = fuel;
     }
 
+    @DynamoDBAttribute(attributeName="Price")
     public Integer getPrice() {
         return price;
     }
@@ -76,6 +87,7 @@ public class CarAdvert {
         this.price = price;
     }
 
+    @DynamoDBAttribute(attributeName="IsNew")
     public Boolean getNew() {
         return isNew;
     }
@@ -84,6 +96,7 @@ public class CarAdvert {
         isNew = aNew;
     }
 
+    @DynamoDBAttribute(attributeName="Mileage")
     public Integer getMileage() {
         return mileage;
     }
@@ -92,6 +105,7 @@ public class CarAdvert {
         this.mileage = mileage;
     }
 
+    @DynamoDBAttribute(attributeName="FirstRegistration")
     public Date getFirst_registration() {
         return first_registration;
     }
@@ -100,6 +114,11 @@ public class CarAdvert {
         this.first_registration = first_registration;
     }
 
+    /**
+     * Mapper for translating POJO to DynamoDB map for creating requests via Document API.
+     *
+     * @return
+     */
     public Map<String, AttributeValue> toDynamoMap() {
         Map<String, AttributeValue> map = new HashMap<String, AttributeValue>();
         map.put("id", new AttributeValue(id));
@@ -112,6 +131,13 @@ public class CarAdvert {
         return map;
     }
 
+    /**
+     * Mapper for translating DynamoDB map to POJO when getting response via Document API.
+     *
+     * @param item
+     * @return
+     * @throws ParseException
+     */
     public static CarAdvert fromDynamoMapAttribute(Map<String, AttributeValue> item) throws ParseException {
         Date first_registration = dateFormat.parse(item.get("first_registration").getS());
 
@@ -126,6 +152,13 @@ public class CarAdvert {
         );
     }
 
+    /**
+     * Mapper for translating POJO to item for creating requests via Document API.
+     *
+     * @param item
+     * @return
+     * @throws ParseException
+     */
     public static CarAdvert fromDynamoItem(Item item) throws ParseException {
         Date first_registration = dateFormat.parse(item.getString("first_registration"));
 
